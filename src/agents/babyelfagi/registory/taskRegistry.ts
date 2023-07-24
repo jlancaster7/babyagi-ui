@@ -7,6 +7,7 @@ import { getUserApiKey } from '@/utils/settings';
 import { translate } from '@/utils/translate';
 import { SkillRegistry } from './skillRegistry';
 import { findMostRelevantObjective } from '@/utils/objective';
+import axios from 'axios';
 
 export class TaskRegistry {
   tasks: AgentTask[];
@@ -52,37 +53,75 @@ export class TaskRegistry {
       throw new Error('User API key is not set.');
     }
 
-    let chunk = '```json\n';
-    const model = new ChatOpenAI(
-      {
-        openAIApiKey,
-        modelName,
-        temperature: 0,
-        maxTokens: 1500,
-        topP: 1,
-        verbose: this.verbose,
-        streaming: true,
-        callbacks: [
-          {
-            handleLLMNewToken(token: string) {
-              chunk += token;
-              const message: Message = {
-                type: 'task-execute',
-                title: translate('CREATING', 'message'),
-                text: chunk,
-                icon: '📝',
-                id: 0,
-              };
-              messageCallback?.(message);
+    let result = '';
+    if (openAIApiKey) {
+      let chunk = '```json\n';
+      const model = new ChatOpenAI(
+        {
+          openAIApiKey,
+          modelName,
+          temperature: 0,
+          maxTokens: 1500,
+          topP: 1,
+          verbose: this.verbose,
+          streaming: true,
+          callbacks: [
+            {
+              handleLLMNewToken(token: string) {
+                chunk += token;
+                const message: Message = {
+                  type: 'task-execute',
+                  title: translate('CREATING', 'message'),
+                  text: chunk,
+                  icon: '📝',
+                  id: 0,
+                };
+                messageCallback?.(message);
+              },
             },
-          },
-        ],
-      },
-      { baseOptions: { signal: abortController?.signal } },
-    );
+          ],
+        },
+        { baseOptions: { signal: abortController?.signal } },
+      );
 
-    const response = await model.call([systemMessage, messages]);
-    const result = response.text;
+      try {
+        const response = await model.call([systemMessage, messages]);
+        result = response.text;
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          console.log('Task creation aborted');
+        }
+        console.log(error);
+      }
+    } else {
+      // server side request
+      const response = await axios
+        .post(
+          '/api/elf/completion',
+          {
+            prompt: prompt,
+            model_name: modelName,
+            temperature: 0,
+            max_tokens: 1500,
+          },
+          {
+            signal: abortController?.signal,
+          },
+        )
+        .catch((error) => {
+          if (error.name === 'AbortError') {
+            console.log('Request aborted', error.message);
+          } else {
+            console.log(error.message);
+          }
+        });
+      result = response?.data?.response;
+    }
+
+    if (result === undefined) {
+      return;
+    }
+
     this.tasks = parseTasks(result);
   }
 
@@ -97,8 +136,24 @@ export class TaskRegistry {
     const dependentTaskOutputs = task.dependentTaskIds
       ? task.dependentTaskIds.map((id) => taskOutputs[id].output).join('\n')
       : '';
-    let taskOutput = await skill.execute(task, dependentTaskOutputs, objective);
-    return taskOutput;
+
+    if (skill.executionLocation === 'server') {
+      // Call the API endpoint if the skill needs to be executed on the server side
+      const response = await axios.post('/api/execute-skill', {
+        task: JSON.stringify(task),
+        dependent_task_outputs: dependentTaskOutputs,
+        objective,
+      });
+      return response.data.taskOutput;
+    } else {
+      // Execute the skill on the client side
+      let taskOutput = await skill.execute(
+        task,
+        dependentTaskOutputs,
+        objective,
+      );
+      return taskOutput;
+    }
   }
 
   getTasks(): AgentTask[] {
