@@ -26,7 +26,7 @@ export class TaskRegistry {
     language: string = 'en',
   ): Promise<void> {
     const relevantObjective = await findMostRelevantObjective(objective);
-    const exapmleObjective = relevantObjective.objective;
+    const exampleObjective = relevantObjective.objective;
     const exampleTaskList = relevantObjective.examples;
     const prompt = `
     You are an expert task list creation AI tasked with creating a  list of tasks as a JSON array, considering the ultimate objective of your team: ${objective}.
@@ -39,7 +39,7 @@ export class TaskRegistry {
     dependent_task_ids should always be an empty array, or an array of numbers representing the task ID it should pull results from.
     Make sure all task IDs are in chronological order.###
     Output must be answered in ${language}.
-    EXAMPLE OBJECTIVE=${exapmleObjective}
+    EXAMPLE OBJECTIVE=${exampleObjective}
     TASK LIST=${JSON.stringify(exampleTaskList)}
     OBJECTIVE=${objective}
     TASK LIST=`;

@@ -1,0 +1,37 @@
+{
+  "objective": "what did regions financial say on their recent call about deposit flows?",
+  "examples": [
+    {
+      "id": 1,
+      "task": "Search for commentary about deposits and deposit flows during the current quarter.",
+      "skill": "transcript_search",
+      "icon": "📞",
+      "dependent_task_ids": [],
+      "status": "incomplete"
+    },
+    {
+      "id": 2,
+      "task": "Perform an additional transcript search based on the information found in the previous search, filling in any gaps that may help you respond.",
+      "skill": "transcript_search",
+      "icon": "📞",
+      "dependent_task_ids": [1],
+      "status": "incomplete"
+    },
+    {
+      "id": 3,
+      "task": "Pick out key information",
+      "skill": "text_completion",
+      "icon": "🤖",
+      "dependent_task_ids": [1,2],
+      "status": "incomplete"
+    },    
+    {
+      "id": 5,
+      "task": "Create final summary",
+      "skill": "text_completion",
+      "icon": "🤖",
+      "dependent_task_ids": [1,2,3],
+      "status": "incomplete"
+    }
+  ]
+}

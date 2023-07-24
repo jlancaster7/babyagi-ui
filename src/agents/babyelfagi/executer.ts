@@ -16,6 +16,8 @@ import {
 import { Skill } from './skills/skill';
 import { getUserApiKey } from '@/utils/settings';
 import { translate } from '@/utils/translate';
+import { TranscriptSearch } from './skills/addons/transcriptSearch';
+import { FiilingSearch } from './skills/addons/filingSearch';
 
 const REFLECTION = false;
 
@@ -67,13 +69,15 @@ export class BabyElfAGI extends AgentExecuter {
     const skills: (typeof Skill)[] = [
       TextCompletion,
       WebSearch,
-      AirtableSaver,
-      CodeReader,
-      CodeWriter,
-      SkillSaver,
-      DirectoryStructure,
+      //AirtableSaver,
+      //CodeReader,
+      //CodeWriter,
+      //SkillSaver,
+      //DirectoryStructure,
       // ObjectiveSaver,
-      YoutubeSearch,
+      //YoutubeSearch,
+      TranscriptSearch,
+      FiilingSearch
     ];
     return skills;
   }

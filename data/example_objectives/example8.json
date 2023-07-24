@@ -1,0 +1,38 @@
+{
+    "objective": "What does Apple say about who its key competitors are in its most recent quarterly filing?",
+    "examples": [
+      {
+        "id": 1,
+        "task": "Search Apple's recent filings for mentions of competitors and who poses the biggest threat to them.",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependent_task_ids": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 2,
+        "task": "Using information gathered from the previous search related to Apple's competition, perform a follow up search to find any additional information that could help you best answer the question.",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependent_task_ids": [1],
+        "status": "incomplete"
+      },
+      {
+        "id": 3,
+        "task": "Pick out key information",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependent_task_ids": [1,2],
+        "status": "incomplete"
+      },    
+      {
+        "id": 5,
+        "task": "Create final summary",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependent_task_ids": [1,2,3],
+        "status": "incomplete"
+      }
+    ]
+  }
+  

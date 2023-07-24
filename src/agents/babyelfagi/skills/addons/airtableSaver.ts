@@ -6,7 +6,7 @@ export class AirtableSaver extends Skill {
   name = 'airtable_saver';
   descriptionForHuman = 'Saves data to Airtable';
   descriptionForModel =
-    'Saves data to Airtable. If objective does not include airtable, this skill dont use anytime.';
+    'Saves data to Airtable. If the objective does not include airtable, do not use this skill.';
   icon = '📦';
   type: SkillType = 'dev';
 

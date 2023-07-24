@@ -15,8 +15,10 @@ const getObjectivesExamples = async () => {
       'example4',
       // 'example5',
       // 'example6',
+      'example7',
+      'example8',
       'example_deer',
-      'example_code',
+      //'example_code',
     ];
     let loadedObjectives: any[] = [];
 

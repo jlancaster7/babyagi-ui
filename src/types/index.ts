@@ -148,3 +148,100 @@ export type LLMParams = {
   streaming?: boolean;
   callbacks?: any[];
 };
+export type SimilarDoc = {
+	id: number;
+	section: string;
+	sectionPosition: number;
+	text: string;
+	score: number;
+	fiscalQuarter: number;
+	fiscalYear: number;
+	calendarQuarter: number;
+	calendarYear: number;
+	docLink: string;
+	title: string;
+	subTitle: string;
+	symbol: string;
+	type: string;
+	xPath: string | string[] | null;
+	eventDate: string;
+	asOfDate?: string;
+};
+
+export type TableInfo = {
+	id: number;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
+export type TranscriptTableWithDetail = {
+	transcriptId: string;
+	participantDescription: string;
+	participantName: string;
+	participantRole: string;
+	session: string;
+	speechPosition: number;
+	hasEmbedding?: boolean;
+	s3Location?: string;
+	xPath: string | null;
+	symbol: string;
+	title: string;
+	quarter: number;
+	year: number;
+	time: string;
+	audio: string;
+	s3HtmlUrl: string | null;
+	calendarYear: number;
+	calendarQuarter: number;
+} & TableInfo;
+
+export type FilingWithDetailTable = {
+	filingListId: number;
+	index: number;
+	s3Location: string;
+	part: string;
+	subPart: string;
+	lastHeader: string;
+	xPaths: string[] | null;
+	tableOfContentsDescription: string;
+	symbol: string;
+	filingType: string;
+	calendarQuarter: number;
+	calendarYear: number;
+	fiscalQuarter: number;
+	fiscalYear: number;
+	reportDate: string;
+	filingDate: string;
+	htmlS3Url: string | null;
+	partDescription: string | null;
+	item: string | null;
+	itemDescription: string | null;
+} & TableInfo;
+
+export enum FilingType {
+	K = '10-K',
+	Q = '10-Q',
+	ER = 'ER',
+	EightK = '8-K',
+}
+
+export type FilingTablesProcessedRecordWithDetailTable = {
+	filingListId: number;
+	index: number;
+	s3Location: string;
+	part: string | null;
+	partDescription: string | null;
+	item: string | null;
+	itemDescription: string | null;
+	lastHeader: string | null;
+	xPath: string;
+	symbol: string;
+	calendarQuarter: number;
+	calendarYear: number;
+	filingDate: string;
+	filingType: FilingType;
+	fiscalQuarter: number;
+	fiscalYear: number;
+	reportDate: string;
+	htmlS3Url: string;
+} & TableInfo;
