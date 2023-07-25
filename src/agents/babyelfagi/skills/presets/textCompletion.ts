@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill } from '../skill';
 
 export class TextCompletion extends Skill {
@@ -14,8 +14,8 @@ export class TextCompletion extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
-    if (!this.valid) return '';
+  ): Promise<ExecuteSkillOutput> {
+    if (!this.valid) return { output: '' };
 
     const prompt = `Complete your assigned task based on the objective and only based on information provided in the dependent task output, if provided. \n###
     Output must be answered in ${this.language}.
@@ -24,11 +24,11 @@ export class TextCompletion extends Skill {
     DEPENDENT TASK OUTPUT=${dependentTaskOutputs}
     RESPONSE=
     `;
-
-    return this.generateText(prompt, task, {
+    const output = await this.generateText(prompt, task, {
       temperature: 0.2,
       maxTokens: 800,
       modelName: 'gpt-3.5-turbo-16k',
-    });
+    }); 
+    return { output }
   }
 }

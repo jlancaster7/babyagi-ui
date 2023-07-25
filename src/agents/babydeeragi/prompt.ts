@@ -10,7 +10,7 @@ export const searchQueryPrompt = (task: string, dependent_task: string) => {
 };
 
 export const analystPrompt = (results: string, language: string) => {
-  return `You are an expert analyst. Rewrite the following information as one report without removing any facts.
+  return `You are an expert analyst. Rewrite the following information as one report without removing any facts. 
   Report must be answered in ${language}.
   \n###INFORMATION:${results}.\n###REPORT:`;
 };

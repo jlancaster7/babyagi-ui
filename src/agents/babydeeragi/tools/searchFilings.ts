@@ -9,6 +9,7 @@ import { translate } from '@/utils/translate';
 import { SimilarDoc } from '@/types';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { getUserApiKey } from '@/utils/settings';
+import { findMostRelevantExamplesByType } from '@/utils/objective';
 
 export const searchFilings = async (
 	objective: string,
@@ -21,41 +22,44 @@ export const searchFilings = async (
 	isRunningRef?: React.MutableRefObject<boolean>,
 	signal?: AbortSignal,
 ) => {
-	
+	const relevantQueryExample = await findMostRelevantExamplesByType(task.task, 'filingSearchQuery');
+	const exampleTask = relevantQueryExample.task;
+	const exampleDependentTaskOutput = relevantQueryExample.dependent_task_output;
+	const exampleObjective = relevantQueryExample.objective;
+	const exampleSearchQuery = relevantQueryExample.search_query;
 
 	const queryPrompt = `Generate a search query to be used in a semantic search of excerpts from public company SEC Filings based on the task, dependent task outputs, the objective.
     Only return the search query. Do not include the company name or type of filing.
-    EXAMPLE TASK=Search Apple's most recent quarterly filing for mentions of competitors and identify who Apple notes as its key competitors.
-    DEPENDENT_TASK_OUTPUT=
-    OBJECTIVE=who does apple note as its key competitors in its most recent quarterly filing?
-    SEARCH_QUERY="key competitors"
+    EXAMPLE TASK=${exampleTask}
+    DEPENDENT_TASK_OUTPUT=${exampleDependentTaskOutput}
+    OBJECTIVE=${exampleObjective}
+    SEARCH_QUERY="${exampleSearchQuery}"
 
 	TASK=${task.task}
     DEPENDENT_TASK_OUTPUT=${dependentTaskOutputs}
     OBJECTIVE=${objective}
     SEARCH_QUERY=
   `;
-
+  	console.log(queryPrompt)
 	const query = await textCompletionTool(
 		queryPrompt,
 		modelName,
 		signal,
 		task.id,
-		messageCallback,
+		//messageCallback,
 	);
     const symbolPrompt = `Return the ticker symbol of the company that is the subject of the task and objective.
     Only return the ticker symbol with no other commentary. 
     Task: ${task.task}
     Objective: ${objective}
   `;
-	console.log(symbolPrompt)
-
+	
 	const symbol = await textCompletionTool(
 		symbolPrompt,
 		modelName,
 		signal,
 		task.id,
-		messageCallback,
+		//messageCallback,
 	);
     let quarterList: any;
     if (symbol !== 'none') {
@@ -74,7 +78,7 @@ export const searchFilings = async (
 		modelName,
 		signal,
 		task.id,
-		messageCallback,
+		//messageCallback,
 	);
       quarterList = JSON.parse(response);
 	  if (Object.keys(quarterList).includes('timePeriods')) {
@@ -83,19 +87,20 @@ export const searchFilings = async (
     }
 
 	const trimmedQuery = query.replace(/^"|"$/g, ''); // remove quotes from the search query
-	console.log('trimmed query', trimmedQuery)
-	let title = `🗄 Searching Filings: ${trimmedQuery}`;
-	let message = `Search query: ${trimmedQuery}\n`;
-	callbackSearchStatus(title, message, task, messageCallback);
-	title = `🗄 Searching Filings for ${symbol}`;
-	message = ``;
-	callbackSearchStatus(title, message, task, messageCallback);
+	
+	let title = `🗄 Searching Filings`;
+	let message = `Search query: ${trimmedQuery}\nSymbol ${symbol}\nQuarter List: ${quarterList}\n`;
+	if (verbose) {
+		console.log(message);
+	}
+	let statusMessage = message
+	callbackSearchStatus(title, statusMessage, task, messageCallback);
+	
+	callbackTaskParameters('🗄 Filing Parameters', JSON.stringify({query: trimmedQuery, symbol, quarterList}),task, messageCallback)
 
-	console.log('search symbol', symbol)
-	console.log('quarter list', quarterList)
+	
+
 	const searchResults = await searchFilingsApi(trimmedQuery, symbol, quarterList, signal);
-	console.log('filing search results',searchResults)
-	let statusMessage = message;
     
 	if (!searchResults?.length) return 
 	if (!isRunningRef?.current) return;
@@ -131,7 +136,7 @@ export const searchFilings = async (
 		statusMessage += `${title}\n`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
 
-		const content = searchResult.text ?? '';
+		let content = searchResult.text ?? '';
 
 		title = `${index}. Extracting relevant info...`;
 		message = `  - Content reading completed. Length:${content.length}. Now extracting relevant info...\n`;
@@ -169,24 +174,27 @@ export const searchFilings = async (
 		statusMessage += `  - Extracting relevant information\n`;
 		title = `${index}. Extracting relevant info...`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
+
+		content = `The following information is from ${searchResult.title}:\n${content}`
+		
 		const info = await largeTextExtract(
 			objective,
-			content.slice(0, 20000),
+			content,
 			task,
 			isRunningRef,
 			callback,
 			signal,
 		);
 
-		message = `  - Relevant info: ${info.slice(0, 100).replace(/\r?\n/g, '')} ...\n`;
+		message = `  - Relevant info: ${info.slice(0, 500).replace(/\r?\n/g, '')} ...\n`;
 		if (verbose) {
-			console.log(message);
+			console.log(info);
 		}
 		statusMessage += message;
 		title = `${index}. Relevant info...`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
 
-		results += `${info}. `;
+		results += `${info}.\n\n`;
 		index += 1;
 		completedCount += 1;
 	}
@@ -220,7 +228,7 @@ export const searchFilings = async (
 	};
 	messageCallback(msg);
 
-	return analyzedResults;
+	return { output: analyzedResults, parameters: { query, symbol, quarterList } };
 };
 
 const callbackSearchStatus = (
@@ -238,7 +246,21 @@ const callbackSearchStatus = (
 		open: false,
 	});
 };
-
+const callbackTaskParameters = (
+	title: string | undefined,
+	message: string,
+	task: AgentTask,
+	messageCallback: (message: Message) => void,
+) => {
+	messageCallback({
+		type: 'task-parameters',
+		title: title ?? '',
+		text: message,
+		id: task.id,
+		icon: '🗄',
+		open: true,
+	});
+};
 const searchFilingsApi = async (query: string, symbol: string, quarterList?: number[], signal?: AbortSignal): Promise<SimilarDoc[] | null> => {
 	const response = await axios
 		.post(

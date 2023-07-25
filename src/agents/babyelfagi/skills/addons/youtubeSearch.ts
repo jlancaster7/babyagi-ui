@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill } from '../skill';
 import axios from 'axios';
 
@@ -13,7 +13,7 @@ export class YoutubeSearch extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
+  ): Promise<ExecuteSkillOutput> {
     const prompt = `Generate query for YouTube search based on the dependent task outputs and the objective.
         Dependent tasks output: ${dependentTaskOutputs}
         Objective: ${objective}
@@ -22,7 +22,7 @@ export class YoutubeSearch extends Skill {
     const searchResults = await this.webSearchTool(`site:youtube.com ${query}`);
     const youtubeLinks = this.extractYoutubeLinks(searchResults);
 
-    return '```json\n' + JSON.stringify(youtubeLinks, null, 2) + '\n```';
+    return { output: '```json\n' + JSON.stringify(youtubeLinks, null, 2) + '\n```' };
   }
 
   webSearchTool = async (query: string) => {

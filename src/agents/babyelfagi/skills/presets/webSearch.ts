@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { webBrowsing } from '@/agents/babydeeragi/tools/webBrowsing';
 import { Skill } from '../skill';
 
@@ -15,8 +15,8 @@ export class WebSearch extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
-    if (!this.valid) return '';
+  ): Promise<ExecuteSkillOutput> {
+    if (!this.valid) return { output: '' };
 
     const taskOutput =
       (await webBrowsing(
@@ -32,6 +32,6 @@ export class WebSearch extends Skill {
         this.abortController.signal,
       )) ?? '';
 
-    return taskOutput;
+    return { output: taskOutput };
   }
 }

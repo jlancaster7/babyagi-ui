@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill, SkillType } from '../skill';
 
 export class SkillSaver extends Skill {
@@ -15,8 +15,8 @@ export class SkillSaver extends Skill {
     task: AgentTask,
     dependentTaskOutputs: any,
     objective: string,
-  ): Promise<string> {
-    if (!this.valid) return '';
+  ): Promise<ExecuteSkillOutput> {
+    if (!this.valid) return {output: ''};
 
     const params = {
       temperature: 0.2,
@@ -46,10 +46,10 @@ export class SkillSaver extends Skill {
       if (!response.ok) {
         throw new Error('Failed to save file');
       }
-      return `Code saved successfully: ${filename}`;
+      return { output: `Code saved successfully: ${filename}` };
     } catch (error) {
       console.error('Error saving code.', error);
-      return 'Error saving code.';
+      return { output: 'Error saving code.' };
     }
   }
 }

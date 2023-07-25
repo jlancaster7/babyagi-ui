@@ -1,6 +1,6 @@
 import Airtable from 'airtable';
 import { Skill, SkillType } from '../skill';
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 
 export class AirtableSaver extends Skill {
   name = 'airtable_saver';
@@ -19,9 +19,9 @@ export class AirtableSaver extends Skill {
     task: AgentTask,
     dependentTaskOutputs: any,
     objective: string,
-  ): Promise<string> {
+  ): Promise<ExecuteSkillOutput> {
     if (!this.valid) {
-      return '';
+      return { output: '' };
     }
 
     const airtable = new Airtable({ apiKey: this.apiKeys['airtable'] });
@@ -30,9 +30,9 @@ export class AirtableSaver extends Skill {
 
     try {
       await base(this.tableName).create([{ fields }]);
-      return 'Record creation successful';
+      return { output: 'Record creation successful' };
     } catch (error: any) {
-      return `Record creation failed: ${error.message}`;
+      return { output: `Record creation failed: ${error.message}` };
     }
   }
 }

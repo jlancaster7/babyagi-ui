@@ -1,4 +1,4 @@
-import { AgentStatus, Message, TaskOutputs } from '@/types'; // You need to define these types
+import { AgentStatus, AgentTask, Message, TaskOutputs } from '@/types'; // You need to define these types
 import { AgentExecuter } from '../base/AgentExecuter';
 import { SkillRegistry, TaskRegistry } from './registory';
 import { translate } from '@/utils/translate';
@@ -16,6 +16,7 @@ export class BabyElfAGI extends AgentExecuter {
     objective: string,
     modelName: string,
     messageCallback: (message: Message) => void,
+    taskCallback: (task: AgentTask | AgentTask[] | undefined) => void,
     statusCallback: (status: AgentStatus) => void,
     cancelCallback: () => void,
     language: string = 'en',
@@ -25,6 +26,7 @@ export class BabyElfAGI extends AgentExecuter {
       objective,
       modelName,
       messageCallback,
+      taskCallback,
       statusCallback,
       cancelCallback,
       language,
@@ -57,6 +59,7 @@ export class BabyElfAGI extends AgentExecuter {
       this.abortController,
       this.language,
     );
+    this.taskCallback(this.taskRegistry.tasks)
     this.printer.printTaskList(this.taskRegistry.tasks, 0);
   }
 
@@ -117,12 +120,21 @@ export class BabyElfAGI extends AgentExecuter {
           this.skillRegistry,
         );
 
-        taskOutputs[task.id] = { completed: true, output: output };
+        taskOutputs[task.id] = { completed: true, output: output.output };
         this.taskRegistry.updateTasks({
           id: task.id,
-          updates: { status: 'complete', result: output },
+          updates: {
+            status: 'complete',
+            result: output.output,
+            parameters: {
+              query: output.parameters?.query,
+              symbol: output.parameters?.symbol,
+              quarterList: output.parameters?.quarterList,
+            },
+          },
         });
-        this.printer.printTaskOutput(output, task);
+        this.taskCallback(this.taskRegistry.tasks.find(a => a.id === task.id))
+        this.printer.printTaskOutput(output.output, task);
         this.sessionSummary += `# ${task.id}: ${task.task}\n${output}\n\n`;
 
         // Reflect on the output of the tasks and possibly add new tasks or update existing ones
@@ -131,7 +143,7 @@ export class BabyElfAGI extends AgentExecuter {
           const [newTasks, insertAfterIds, tasksToUpdate] =
             await this.taskRegistry.reflectOnOutput(
               this.objective,
-              output,
+              output.output,
               skillDescriptions,
             );
 

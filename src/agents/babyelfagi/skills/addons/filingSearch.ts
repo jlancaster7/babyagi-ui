@@ -1,6 +1,6 @@
 import Airtable from 'airtable';
 import { Skill, SkillType } from '../skill';
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { searchFilings } from '@/agents/babydeeragi/tools/searchFilings';
 import axios from 'axios';
 
@@ -19,9 +19,9 @@ export class FiilingSearch extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
+  ): Promise<ExecuteSkillOutput> {
     if (!this.valid) {
-      return '';
+      return { output: '' };
     }
 
     const taskOutput = await searchFilings(
@@ -35,6 +35,6 @@ export class FiilingSearch extends Skill {
 	  this.isRunningRef,
       this.abortController.signal,
     );
-	return taskOutput ?? '';
+	return { output: taskOutput?.output ?? '', parameters: taskOutput?.parameters };
   }
 }

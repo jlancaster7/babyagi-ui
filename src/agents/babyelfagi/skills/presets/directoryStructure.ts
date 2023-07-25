@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill, SkillType } from '../skill';
 
 export class DirectoryStructure extends Skill {
@@ -14,13 +14,14 @@ export class DirectoryStructure extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<any> {
+  ): Promise<ExecuteSkillOutput> {
     const response = await fetch('/api/local/directory-structure', {
       method: 'GET',
     });
     if (!response.ok) {
       throw new Error('Failed to get directory structure');
     }
-    return await response.json();
+    const output = await response.json()
+    return { output };
   }
 }

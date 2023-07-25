@@ -11,6 +11,8 @@ import {
 } from '../skills';
 import { Skill } from '../skills/skill';
 import { getUserApiKey } from '@/utils/settings';
+import { TranscriptSearch } from '../skills/addons/transcriptSearch';
+import { FiilingSearch } from '../skills/addons/filingSearch';
 
 export class SkillRegistry {
   skillClasses: (typeof Skill)[];
@@ -73,12 +75,14 @@ export class SkillRegistry {
     const skills: (typeof Skill)[] = [
       TextCompletion,
       WebSearch,
-      AirtableSaver,
-      CodeReader,
-      CodeWriter,
-      SkillSaver,
-      DirectoryStructure,
-      YoutubeSearch,
+      // AirtableSaver,
+      // CodeReader,
+      // CodeWriter,
+      // SkillSaver,
+      // DirectoryStructure,
+      // YoutubeSearch,
+      TranscriptSearch,
+      FiilingSearch
     ];
     return skills;
   }

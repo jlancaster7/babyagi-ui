@@ -1,0 +1,6 @@
+{
+    "task": "Search Apple's most recent quarterly filing for mentions of competitors and identify who Apple notes as its key competitors.",
+    "objective": "who does apple note as its key competitors in its most recent quarterly filing?",
+    "dependent_task_output": "",
+    "search_query": "key competitors"
+}

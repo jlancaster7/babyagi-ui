@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import va from '@vercel/analytics';
 import {
   AgentStatus,
+  AgentTask,
   AgentType,
   Execution,
   Message,
@@ -34,7 +35,7 @@ import axios from 'axios';
 import { taskCompletedNotification } from '@/utils/notification';
 import { useTranslation } from 'next-i18next';
 import { AgentMessageBlock } from './AgentMessageBlock';
-import { AgentTask } from './AgentTask';
+import { AgentTaskBlock } from './AgentTaskBlock';
 import { IntroGuide } from './IntroGuide';
 import { BabyElfAGI } from '@/agents/babyelfagi/executer';
 import { SkillsList } from './SkillList';
@@ -54,11 +55,12 @@ export const Agent: FC = () => {
     type: 'ready',
   });
   const [agent, setAgent] = useState<
-    BabyAGI | BabyBeeAGI | BabyCatAGI | BabyDeerAGI | BabyElfAGI | null
+    BabyDeerAGI | BabyElfAGI | null
   >(null);
   const [selectedAgent, setSelectedAgent] = useState<SelectItem>(AGENT[0]);
   const { i18n } = useTranslation();
   const [language, setLanguage] = useState(i18n.language);
+  const [taskList, setTaskList] = useState<AgentTask[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const {
@@ -166,7 +168,26 @@ export const Agent: FC = () => {
       return updatedMessages;
     });
   };
-
+  const taskHandler = (task: AgentTask | AgentTask[] | undefined) => {
+    if (Array.isArray(task)) {
+      setTaskList(task)
+    } else if (task) {
+      setTaskList((currentTaskList) => {
+        const index = currentTaskList.findIndex(
+          (currentTask) => currentTask.id === task.id
+        );
+        if (index !== -1) {
+          const newTaskList = [...currentTaskList];
+          newTaskList[index] = task;
+          return newTaskList
+        }
+        
+        const updatedTaskList = [...currentTaskList, task];
+  
+        return updatedTaskList
+      })
+    }
+  }
   const inputHandler = (value: string) => {
     setObjective(value);
   };
@@ -195,53 +216,17 @@ export const Agent: FC = () => {
     setMessages([]);
     setExecuting(true);
     const execution = await saveNewData();
-    const verbose = false; // You can set this to true to see the agent's internal state
+    const verbose = true; // You can set this to true to see the agent's internal state
 
     // switch agent
     let agent = null;
     switch (selectedAgent.id) {
-      case 'babyagi':
-        agent = new BabyAGI(
-          objective,
-          model.id,
-          Number(iterations.id),
-          firstTask,
-          execution.id,
-          messageHandler,
-          setAgentStatus,
-          cancelHandle,
-          language,
-          verbose,
-        );
-        break;
-      case 'babybeeagi':
-        agent = new BabyBeeAGI(
-          objective,
-          model.id,
-          firstTask,
-          messageHandler,
-          setAgentStatus,
-          cancelHandle,
-          language,
-          verbose,
-        );
-        break;
-      case 'babycatagi':
-        agent = new BabyCatAGI(
-          objective,
-          model.id,
-          messageHandler,
-          setAgentStatus,
-          cancelHandle,
-          language,
-          verbose,
-        );
-        break;
       case 'babydeeragi':
         agent = new BabyDeerAGI(
           objective,
           model.id,
           messageHandler,
+          taskHandler,
           setAgentStatus,
           cancelHandle,
           language,
@@ -253,6 +238,7 @@ export const Agent: FC = () => {
           objective,
           model.id,
           messageHandler,
+          taskHandler,
           setAgentStatus,
           cancelHandle,
           language,
@@ -440,6 +426,7 @@ export const Agent: FC = () => {
         objective,
         model.id,
         messageHandler,
+        taskHandler,
         setAgentStatus,
         cancelHandle,
         language,
@@ -493,22 +480,14 @@ export const Agent: FC = () => {
       ) : (
         <div className="max-h-full overflow-scroll">
           <AgentMessageHeader model={model} agent={selectedAgent} />
-          {messageBlocks.map((block, index) =>
-            currentAgentId() === 'babydeeragi' ||
-            currentAgentId() === 'babyelfagi' ? (
-              <AgentTask
+          {messageBlocks.map((block, index) => (
+              <AgentTaskBlock
+                task={taskList.find(a => a.id === block.id)}
                 block={block}
                 key={index}
                 userInputCallback={userInputHandler}
               />
-            ) : (
-              <AgentMessageBlock
-                block={block}
-                key={index}
-                userInputCallback={userInputHandler}
-              />
-            ),
-          )}
+              ))}
           {isExecuting && (
             <AgentMessage message={loadingAgentMessage(agentStatus)} />
           )}

@@ -117,7 +117,6 @@ const searchFilingsTable = async (repo: Repository, queryEmbedding: number[], fi
         filter,
         true
         )).matches;
-    console.log('# of filings tables returned', matches?.length)
     if (!matches?.length) return [];
 
     const filings = await repo.getFilingTablesProcessedWithDetailsById(
@@ -128,7 +127,7 @@ const searchFilingsTable = async (repo: Repository, queryEmbedding: number[], fi
 	let formattedFilings: Promise<SimilarDoc>[] = [];
     matches.forEach((match, index) => {
         const filing = filings.find(
-            (a) => Number(a.id) === Number(String(match.id).split('_')[1])
+            (a) => Number(a.id) === Number(String(match.id).split('_')[2])
             );
         if (filing?.s3Location) {
             formattedFilings.push(

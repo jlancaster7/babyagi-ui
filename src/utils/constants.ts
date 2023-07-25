@@ -46,26 +46,26 @@ export const AGENT = [
     message: '',
     badge: 'BETA',
   },
-  {
-    id: 'babydeeragi',
-    name: 'BabyDeerAGI',
-    icon: '🦌',
-    message: '🤖/🔎+📄/🧑‍💻',
-    badge: 'STABLE',
-  },
-  {
-    id: 'babycatagi',
-    name: 'BabyCatAGI',
-    icon: '🐱',
-    message: '🤖/🔎+📄',
-  },
-  {
-    id: 'babybeeagi',
-    name: 'BabyBeeAGI',
-    icon: '🐝',
-    message: '🤖/🔎/📄',
-  },
-  { id: 'babyagi', name: 'BabyAGI', icon: '👶', message: '🤖' },
+  // {
+  //   id: 'babydeeragi',
+  //   name: 'BabyDeerAGI',
+  //   icon: '🦌',
+  //   message: '🤖/🔎+📄/🧑‍💻',
+  //   badge: 'STABLE',
+  // },
+  // {
+  //   id: 'babycatagi',
+  //   name: 'BabyCatAGI',
+  //   icon: '🐱',
+  //   message: '🤖/🔎+📄',
+  // },
+  // {
+  //   id: 'babybeeagi',
+  //   name: 'BabyBeeAGI',
+  //   icon: '🐝',
+  //   message: '🤖/🔎/📄',
+  // },
+  // { id: 'babyagi', name: 'BabyAGI', icon: '👶', message: '🤖' },
 ];
 
 export const THEME = [

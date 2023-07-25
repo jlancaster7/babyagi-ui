@@ -1,12 +1,12 @@
 import _ from 'lodash';
-import { AgentTask, Message, TaskOutputs } from '@/types';
+import { AgentTask, ExecuteSkillOutput, Message, TaskOutputs } from '@/types';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { parseTasks } from '@/utils/task';
 import { HumanChatMessage, SystemChatMessage } from 'langchain/schema';
 import { getUserApiKey } from '@/utils/settings';
 import { translate } from '@/utils/translate';
 import { SkillRegistry } from './skillRegistry';
-import { findMostRelevantObjective } from '@/utils/objective';
+import { findMostRelevantExamplesByType } from '@/utils/objective';
 import axios from 'axios';
 
 export class TaskRegistry {
@@ -26,7 +26,7 @@ export class TaskRegistry {
     abortController?: AbortController,
     language: string = 'en',
   ): Promise<void> {
-    const relevantObjective = await findMostRelevantObjective(objective);
+    const relevantObjective = await findMostRelevantExamplesByType(objective, 'objective');
     const exampleObjective = relevantObjective.objective;
     const exampleTaskList = relevantObjective.examples;
     const prompt = `
@@ -131,7 +131,7 @@ export class TaskRegistry {
     taskOutputs: TaskOutputs,
     objective: string,
     skillRegistry: SkillRegistry,
-  ): Promise<string> {
+  ): Promise<ExecuteSkillOutput> {
     const skill = skillRegistry.getSkill(task.skill ?? '');
     const dependentTaskOutputs = task.dependentTaskIds
       ? task.dependentTaskIds.map((id) => taskOutputs[id].output).join('\n')
@@ -144,7 +144,7 @@ export class TaskRegistry {
         dependent_task_outputs: dependentTaskOutputs,
         objective,
       });
-      return response.data.taskOutput;
+      return { output: response.data.taskOutput, parameters: response.data.parameters };
     } else {
       // Execute the skill on the client side
       let taskOutput = await skill.execute(
@@ -152,7 +152,7 @@ export class TaskRegistry {
         dependentTaskOutputs,
         objective,
       );
-      return taskOutput;
+      return { output: taskOutput.output, parameters: taskOutput.parameters };
     }
   }
 

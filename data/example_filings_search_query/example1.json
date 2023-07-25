@@ -1,0 +1,6 @@
+{
+    "task": "Search for company X's most recent quarterly financial report to find the revenue earned last quarter.",
+    "objective": "How much revenue did company X earn last quarter?",
+    "dependent_task_output": "",
+    "search_query": "revenue in income statement"
+}

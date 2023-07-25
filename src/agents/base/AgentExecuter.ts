@@ -5,6 +5,7 @@ export class AgentExecuter {
   objective: string;
   modelName: string;
   messageCallback: (message: Message) => void;
+  taskCallback: (task: AgentTask | AgentTask[] | undefined)  => void;
   statusCallback: (status: AgentStatus) => void;
   cancelCallback: () => void;
   language: string = 'en';
@@ -22,6 +23,7 @@ export class AgentExecuter {
     objective: string,
     modelName: string,
     messageCallback: (message: Message) => void,
+    taskCallback: (task: AgentTask | AgentTask[] | undefined) => void,
     statusCallback: (status: AgentStatus) => void,
     cancelCallback: () => void,
     language: string = 'en',
@@ -30,6 +32,7 @@ export class AgentExecuter {
     this.objective = objective;
     this.modelName = modelName;
     this.messageCallback = messageCallback;
+    this.taskCallback = taskCallback;
     this.statusCallback = statusCallback;
     this.cancelCallback = cancelCallback;
     this.language = language;

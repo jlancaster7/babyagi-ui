@@ -41,7 +41,7 @@ export const searchTranscripts = async (
     Task: ${task.task}
     Objective: ${objective}
   `;
-	console.log(symbolPrompt)
+
 
 	const symbol = await textCompletionTool(
 		symbolPrompt,
@@ -124,7 +124,7 @@ export const searchTranscripts = async (
 		statusMessage += `${title}\n`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
 
-		const content = searchResult.text ?? '';
+		let content = searchResult.text ?? '';
 
 		title = `${index}. Extracting relevant info...`;
 		message = `  - Content reading completed. Length:${content.length}. Now extracting relevant info...\n`;
@@ -162,9 +162,12 @@ export const searchTranscripts = async (
 		statusMessage += `  - Extracting relevant information\n`;
 		title = `${index}. Extracting relevant info...`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
+		
+		content = `The following information is from ${searchResult.title}:\n${content}`
+		
 		const info = await largeTextExtract(
 			objective,
-			content.slice(0, 20000),
+			content,
 			task,
 			isRunningRef,
 			callback,
@@ -213,7 +216,7 @@ export const searchTranscripts = async (
 	};
 	messageCallback(msg);
 
-	return analyzedResults;
+	return { output: analyzedResults, parameters: { query, symbol, quarterList } };
 };
 
 const callbackSearchStatus = (

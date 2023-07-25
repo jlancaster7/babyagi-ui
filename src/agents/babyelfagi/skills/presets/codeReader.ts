@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill, SkillType } from '../skill';
 
 export class CodeReader extends Skill {
@@ -15,8 +15,8 @@ export class CodeReader extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
-    if (!this.valid) return '';
+  ): Promise<ExecuteSkillOutput> {
+    if (!this.valid) return { output: '' };
 
     const dirStructure = await this.getDirectoryStructure();
     console.log(`Directory structure: ${JSON.stringify(dirStructure)}`);
@@ -42,13 +42,13 @@ export class CodeReader extends Skill {
       }
       const fileContent = await response.json();
       console.log(`File content:\n${JSON.stringify(fileContent)}`);
-      return JSON.stringify(fileContent);
+      return { output: JSON.stringify(fileContent) };
     } catch (error) {
       console.error(
         "File not found. Please check the AI's suggested file path.",
         error,
       );
-      return "File not found. Please check the AI's suggested file path.";
+      return { output: "File not found. Please check the AI's suggested file path." };
     }
   }
 

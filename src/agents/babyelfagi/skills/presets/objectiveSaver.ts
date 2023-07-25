@@ -1,4 +1,4 @@
-import { AgentTask } from '@/types';
+import { AgentTask, ExecuteSkillOutput } from '@/types';
 import { Skill, SkillType } from '../skill';
 
 export class ObjectiveSaver extends Skill {
@@ -15,8 +15,8 @@ export class ObjectiveSaver extends Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
-    if (!this.valid) return '';
+  ): Promise<ExecuteSkillOutput> {
+    if (!this.valid) return { output: '' };
 
     const code = dependentTaskOutputs;
     const prompt = `Come up with a file name (eg. 'research_shoes.json') for the following objective:${code}\n###\nFILE_NAME:`;
@@ -39,10 +39,10 @@ export class ObjectiveSaver extends Skill {
       if (!response.ok) {
         throw new Error('Failed to save file');
       }
-      return `Code saved successfully: ${filename}`;
+      return { output: `Code saved successfully: ${filename}` };
     } catch (error) {
       console.error('Error saving code.', error);
-      return 'Error saving code.';
+      return { output: 'Error saving code.' };
     }
   }
 }

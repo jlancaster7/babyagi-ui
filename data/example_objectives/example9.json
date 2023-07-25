@@ -1,0 +1,54 @@
+{
+    "objective": "Adjust Ameris Bancorp's tangible book value for the difference between their loans, net carrying value minus fair value.",
+    "examples": [
+      {
+        "id": 1,
+        "task": "What is Ameris Bancorp's tangible book value in the most recent quarter?",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependent_task_ids": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 2,
+        "task": "What is Ameris Bancorp's tangible book value in the most recent quarter?",
+        "skill": "transcript_search",
+        "icon": "📞",
+        "dependent_task_ids": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 3,
+        "task": "What is the fair value and the carrying value of loans held for investment in the most recent quarter?",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependent_task_ids": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 4,
+        "task": "Calculate the difference between the loans held for investment's carrying value and fair value.",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependent_task_ids": [3],
+        "status": "incomplete"
+      },
+      {
+        "id": 5,
+        "task": "Ensure that tangible book value and the difference between carrying value and fair value of loans held for investment are of the same denomination. Tangible book value may be presented as 'per share'.",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependent_task_ids": [1,2,3,4],
+        "status": "incomplete"
+      },
+      {
+        "id": 6,
+        "task": "Subtract the difference of carrying value and fair value of loans held for investment from tangible book value.",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependent_task_ids": [1,2,3,4,5],
+        "status": "incomplete"
+      }
+    ]
+  }
+  

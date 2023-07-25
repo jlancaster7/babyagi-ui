@@ -1,4 +1,4 @@
-import { AgentTask, LLMParams, Message } from '@/types';
+import { AgentTask, ExecuteSkillOutput, LLMParams, Message } from '@/types';
 import { setupMessage } from '@/utils/message';
 import { getUserApiKey } from '@/utils/settings';
 import axios from 'axios';
@@ -87,7 +87,7 @@ export class Skill {
     task: AgentTask,
     dependentTaskOutputs: string,
     objective: string,
-  ): Promise<string> {
+  ): Promise<ExecuteSkillOutput> {
     // This method should be overridden by subclasses
     throw new Error("Method 'execute' must be implemented");
   }
