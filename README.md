@@ -1,3 +1,17 @@
+# 👶🤖🖥️ BabyMichael Agi - Fork of BabyAGI UI
+
+I forked this repo to start adding in skills that I wanted the AI Agent to have access to. 
+Two skills that I added:
+   1) Transcript Search - Implements a hybrid search utilizing dense and sparse vector search with Pinecone to find excerpts from Public Company Transcripts that are most relevant to the given task. These excerpts are then passed to a LLM to be summarized and returned as the output for a given task.
+   2) Filing Search - Similar to Transcript search, it implements a hybrid search utilizing dense and sparse embedding vector search with Pinecone to find excerpts from Public Company SEC filings that are most relevant to a given task. These excerpts are then passed to a LLM to be summarized and returned as the output for a given task.
+
+Future plans
+- [ ] Enable users to initially generate the tasks and edit them if they determine they are not sufficient to complete the higher level objective before actually running the tasks as a whole.
+- [ ] Enable users to edit tasks after the Agent has attempted to complete the objective and enable the user to run each task independently to allow for tuning.
+
+
+
+
 # 👶🤖🖥️ BabyAGI UI
 
 [![GitHub last commit](https://img.shields.io/github/last-commit/miurla/babyagi-ui)](https://github.com/miurla/babyagi-ui/commit/main)
