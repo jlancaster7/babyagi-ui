@@ -1,0 +1,6 @@
+{
+    "task": "Search for forward financial guidance provided in the Q4 2022 earnings call.",
+    "objective": "Compare forward guidance for Q1 2023, given in Q4 2022, to actual reported figures in Q1 2023.",
+    "dependent_task_output": "",
+    "search_query": ["financial forward guidance", "financial outlook", "guidance for next year", "guidance for next quarter"]
+}

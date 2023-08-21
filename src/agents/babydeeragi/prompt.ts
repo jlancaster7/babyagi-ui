@@ -9,10 +9,13 @@ export const searchQueryPrompt = (task: string, dependent_task: string) => {
   Search Query:`;
 };
 
-export const analystPrompt = (results: string, language: string) => {
-  return `You are an expert analyst. Rewrite the following information as one report without removing any facts. 
+export const analystPrompt = (results: string, task: string, language: string) => {
+  return `You are an expert analyst. Rewrite the following information as one report so that only facts directly relevant to the following Task remain.
+  You don't need to mention documents that didn't contain information. Only report on the information that was found.
   Report must be answered in ${language}.
-  \n###INFORMATION:${results}.\n###REPORT:`;
+  TASK=${task}
+  INFORMATION=${results}.
+  REPORT:`;
 };
 
 export const textCompletionToolPrompt = (

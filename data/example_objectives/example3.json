@@ -1,6 +1,6 @@
 {
   "objective": "Research untapped.vc",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Conduct a web search on 'untapped.vc' to gather information about the company, its investments, and its impact in the startup ecosystem.",

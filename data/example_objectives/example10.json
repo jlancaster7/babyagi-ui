@@ -1,0 +1,38 @@
+{
+    "objective": "calculate ameris bancorp's tangible book value.",
+    "tasks": [
+      {
+        "id": 1,
+        "task": "Search for Total Shareholder Equity in Ameris Bancorp's most recent balance sheet.",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependentTaskIds": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 2,
+        "task": "Search for the value of all intangible assets in Ameris Bancorp's most recent balance sheet. Make sure to include Goodwill.",
+        "skill": "filing_search",
+        "icon": "🗄",
+        "dependentTaskIds": [],
+        "status": "incomplete"
+      },
+      {
+        "id": 3,
+        "task": "Calculate Ameris Bancorp's tangible book value by using the following formula: Tangible Book Value = Total Shareholder Equity - Intangible Assets - Goodwill.",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependentTaskIds": [1,2],
+        "status": "incomplete"
+      },
+      {
+        "id": 4,
+        "task": "Provide the calculated tangible book value of Ameris Bancorp.",
+        "skill": "text_completion",
+        "icon": "🤖",
+        "dependentTaskIds": [3],
+        "status": "incomplete"
+      }
+    ]
+  }
+  

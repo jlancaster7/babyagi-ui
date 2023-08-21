@@ -1,6 +1,6 @@
 {
   "objective": "Create a new skill that looks up the weather based on a location input.",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Search code examples for free weather APIs to gather information on how to retrieve weather data based on a location input.",

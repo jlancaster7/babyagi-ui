@@ -1,6 +1,6 @@
 {
     "objective": "Adjust Ameris Bancorp's tangible book value for the difference between their loans, net carrying value minus fair value.",
-    "examples": [
+    "tasks": [
       {
         "id": 1,
         "task": "What is Ameris Bancorp's tangible book value in the most recent quarter?",

@@ -194,7 +194,7 @@ export const searchFilings = async (
 		title = `${index}. Relevant info...`;
 		callbackSearchStatus(title, statusMessage, task, messageCallback);
 
-		results += `${info}.\n\n`;
+		results += `Notes from Document ${index}:\n${info}.\n\n`;
 		index += 1;
 		completedCount += 1;
 	}
@@ -208,7 +208,7 @@ export const searchFilings = async (
 		messageCallback,
 	);
 
-	const ap = analystPrompt(results, language);
+	const ap = analystPrompt(results, task.task, language);
 	const analyzedResults = await textCompletionTool(
 		ap,
 		modelName,

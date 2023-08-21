@@ -134,7 +134,7 @@ export const webBrowsing = async (
     messageCallback,
   );
 
-  const ap = analystPrompt(results, language);
+  const ap = analystPrompt(results, task.task, language);
   const analyzedResults = await textCompletionTool(
     ap,
     modelName,

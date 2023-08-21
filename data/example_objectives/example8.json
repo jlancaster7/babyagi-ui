@@ -1,6 +1,6 @@
 {
     "objective": "What does Apple say about who its key competitors are in its most recent quarterly filing?",
-    "examples": [
+    "tasks": [
       {
         "id": 1,
         "task": "Search Apple's recent filings for mentions of competitors and who poses the biggest threat to them.",

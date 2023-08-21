@@ -8,6 +8,7 @@ import { translate } from '@/utils/translate';
 import { SkillRegistry } from './skillRegistry';
 import { findMostRelevantExamplesByType } from '@/utils/objective';
 import axios from 'axios';
+import { textCompletionTool } from '@/agents/common/tools/textCompletionTool';
 
 export class TaskRegistry {
   tasks: AgentTask[];
@@ -25,25 +26,73 @@ export class TaskRegistry {
     messageCallback?: (message: Message) => void,
     abortController?: AbortController,
     language: string = 'en',
+    example?: { objective: string; tasks: AgentTask[] },
   ): Promise<void> {
-    const relevantObjective = await findMostRelevantExamplesByType(objective, 'objective');
-    const exampleObjective = relevantObjective.objective;
-    const exampleTaskList = relevantObjective.examples;
+    // let priorCriticismPrompt = '';
+    // let taskListCommentary = ''
+    // if (example?.tasks.length) {
+    //   priorCriticismPrompt = `You are an expert task list creation AI tasked with creating a list of tasks as a JSON array, considering the ultimate objective of your team: ${objective}.
+    //   AVAILABLE SKILLS: ${skillDescriptions}.
+    //   The below is an objective and the task list that you previously created and executed to complete the objective.
+    //   PRIOR:
+    //     OBJECTIVE=${example.objective}
+    //     TASK_LIST=${JSON.stringify(example.tasks.slice(0, example.tasks.length - 2).map(a => {
+    //       return {
+    //         id: a.id,
+    //         task: a.task,
+    //         skill: a.skill,
+    //         result: a.result
+    //       }
+    //     }))}
+    //     RESULT=${example.tasks[example.tasks.length - 1].result}
+    //   What is one way that this task list could be improved?
+    //   `
+    //   taskListCommentary = await textCompletionTool(priorCriticismPrompt, 'gpt-3.5-turbo-16k', abortController?.signal)
+    //   console.log(taskListCommentary)
+    // } 
+
+
+
+    let examplePrompt: string
+
+    if (example?.tasks.length) {
+      examplePrompt = `GUIDANCE:
+      The below is an objective and a task list that you previously created and executed along with some commentary on how to improve this task list. 
+      PRIOR:
+      OBJECTIVE=${example.objective}
+      TASK_LIST=${JSON.stringify(example.tasks.map(a => {
+        return {
+          id: a.id,
+          task: a.task,
+          skill: a.skill,
+          icon: a.icon,
+          dependent_task_ids: a.dependentTaskIds,
+        }
+      }))}
+
+      `
+    } else {
+      const relevantObjective = await findMostRelevantExamplesByType(objective, 'objective');
+      examplePrompt = `EXAMPLE: OBJECTIVE=${relevantObjective.objective}
+      TASK_LIST=${JSON.stringify(relevantObjective.tasks)}`
+    }
+
     const prompt = `
-    You are an expert task list creation AI tasked with creating a  list of tasks as a JSON array, considering the ultimate objective of your team: ${objective}.
-    Create a very short task list based on the objective, the final output of the last task will be provided back to the user. Limit tasks types to those that can be completed with the available skills listed below. Task description should be detailed.###
+    You are an expert task list creation AI tasked with creating a list of tasks as a JSON array, considering the ultimate objective of your team: ${objective}.
+    Create a very short task list based on the objective, the final output of the last task will be provided back to the user. 
+    Limit tasks types to those that can be completed with the available skills listed below. Task description should be detailed.###
     AVAILABLE SKILLS: ${skillDescriptions}.###
     RULES:
     Do not use skills that are not listed.
     Always include one skill.
-    Do not create files unless specified in the objective.    
+    Do not create files unless specified in the objective.
     dependent_task_ids should always be an empty array, or an array of numbers representing the task ID it should pull results from.
     Make sure all task IDs are in chronological order.###
     Output must be answered in ${language}.
-    EXAMPLE OBJECTIVE=${exampleObjective}
-    TASK LIST=${JSON.stringify(exampleTaskList)}
+    ${examplePrompt}
+
     OBJECTIVE=${objective}
-    TASK LIST=`;
+    TASK_LIST=`;
     const systemPrompt = 'You are a task creation AI.';
     const systemMessage = new SystemChatMessage(systemPrompt);
     const messages = new HumanChatMessage(prompt);
@@ -59,7 +108,7 @@ export class TaskRegistry {
       const model = new ChatOpenAI(
         {
           openAIApiKey,
-          modelName,
+          modelName: 'gpt-3.5-turbo-16k',
           temperature: 0,
           maxTokens: 1500,
           topP: 1,
@@ -134,9 +183,9 @@ export class TaskRegistry {
   ): Promise<ExecuteSkillOutput> {
     const skill = skillRegistry.getSkill(task.skill ?? '');
     const dependentTaskOutputs = task.dependentTaskIds
-      ? task.dependentTaskIds.map((id) => taskOutputs[id].output).join('\n')
+      ? task.dependentTaskIds.map((id) => `Task ${id} Output: ${taskOutputs[id].output}`).join('\n')
       : '';
-
+    console.log('dependent task outputs', dependentTaskOutputs)
     if (skill.executionLocation === 'server') {
       // Call the API endpoint if the skill needs to be executed on the server side
       const response = await axios.post('/api/execute-skill', {
@@ -144,7 +193,10 @@ export class TaskRegistry {
         dependent_task_outputs: dependentTaskOutputs,
         objective,
       });
-      return { output: response.data.taskOutput, parameters: response.data.parameters };
+      return {
+        output: response.data.taskOutput,
+        parameters: response.data.parameters,
+      };
     } else {
       // Execute the skill on the client side
       let taskOutput = await skill.execute(

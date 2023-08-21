@@ -13,6 +13,7 @@ export class AgentExecuter {
 
   taskIdCounter: number = 0;
   retryCounter: number = 0;
+  exampleTaskList: AgentTask[] = [];
   taskList: AgentTask[] = [];
   isRunningRef = { current: false };
 

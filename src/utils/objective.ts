@@ -2,42 +2,8 @@ import { getUserApiKey } from '@/utils/settings';
 import axios from 'axios';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 
-const getObjectivesExamples = async () => {
-  const storedObjectives = localStorage.getItem('BABYAGIUI_OBJECTIVES');
 
-  if (storedObjectives) {
-    // return JSON.parse(storedObjectives);
-    return [];
-  } else {
-    const jsonFiles = [
-      // 'example1',
-      // 'example2',
-      './data/example_objectives/example3',
-      './data/example_objectives/example4',
-      // 'example5',
-      // 'example6',
-      './data/example_objectives/example7',
-      './data/example_objectives/example8',
-      './data/example_objectives/example9',
-      './data/example_objectives/example_deer',
-      //'example_code',
-    ];
-    let loadedObjectives: any[] = [];
-
-    for (const jsonFile of jsonFiles) {
-      const response = await fetch(`/api/json-provider?file=${jsonFile}`);
-      const data = await response.json();
-      loadedObjectives.push(data);
-    }
-
-    return loadedObjectives;
-  }
-};
-const getFilingSearchExamples = async () => {
-  const jsonFiles = [
-	'./data/example_filings_search_query/example1',
-	'./data/example_filings_search_query/example2'
-];
+const getExamples = async (jsonFiles: string[]) => {
   let loadedObjectives: any[] = [];
 
   for (const jsonFile of jsonFiles) {
@@ -47,7 +13,33 @@ const getFilingSearchExamples = async () => {
   }
 
   return loadedObjectives;
-};
+}
+const objectiveJsonFiles = [
+  './data/example_objectives/example_deer',
+  // 'example1',
+  // 'example2',
+  './data/example_objectives/example3',
+  './data/example_objectives/example4',
+  // 'example5',
+  // 'example6',
+  './data/example_objectives/example7',
+  './data/example_objectives/example8',
+  './data/example_objectives/example9',
+  './data/example_objectives/example10',
+
+  //'example_code',
+];
+const filingSearchJsonFiles = [
+	'./data/example_filings_search_query/example1',
+	'./data/example_filings_search_query/example2'
+];
+const transcriptSearchJsonFiles: string[] = [
+	'./data/example_transcript_search_query/example1',
+	'./data/example_transcript_search_query/example2',
+  './data/example_transcript_search_query/example3',
+  './data/example_transcript_search_query/example4'
+];
+
 async function getEmbedding(
   text: string,
   modelName: string = 'text-embedding-ada-002',
@@ -100,13 +92,15 @@ export async function findMostRelevantExamplesByType(
   let examples: any[] = [];
 
   if (type === 'objective') {
-    examples = await getObjectivesExamples();
+    examples = await getExamples(objectiveJsonFiles);
   } else if (type === 'filingSearchQuery') {
-    examples = await getFilingSearchExamples();
+    examples = await getExamples(filingSearchJsonFiles)
+  } else if (type === 'transcriptSearchQuery') {
+    examples = await getExamples(transcriptSearchJsonFiles)
   } else return;
 
   let maxSimilarity = -Infinity;
-  let mostRelevantExample = null;
+  let mostRelevantExample = undefined;
 
   for (const example of examples) {
     const objectiveEmbedding = await getEmbedding(type === 'filingSearchQuery' ? example.task : example.objective);
@@ -120,6 +114,7 @@ export async function findMostRelevantExamplesByType(
       mostRelevantExample = example;
     }
   }
-
-  return mostRelevantExample;
+  // if most similar isn't greater than 0.80, then have the first example be the default. 
+  if (maxSimilarity < 0.8) return examples[0];
+  else return mostRelevantExample;
 }

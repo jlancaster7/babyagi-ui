@@ -15,6 +15,7 @@ const handler = async (req: NextRequest) => {
       topP: 1,
       frequencyPenalty: 0,
       presencePenalty: 0,
+      maxRetries: 3
     });
 
     const prompt = relevantInfoExtractionPrompt();

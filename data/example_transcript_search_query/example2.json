@@ -1,0 +1,6 @@
+{
+    "task": "Search for CrowdStrike's net retention rate last quarter.",
+    "objective": "what was crowdstrikes net retention rate last quarter?",
+    "dependent_task_output": "",
+    "search_query": ["What is the Net retention rate?", "Net retention rate"]
+}

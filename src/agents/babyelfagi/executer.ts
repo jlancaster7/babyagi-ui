@@ -47,7 +47,15 @@ export class BabyElfAGI extends AgentExecuter {
 
   async prepare() {
     await super.prepare();
-
+    try {
+      const response = await fetch(`/api/local/get-example-task-list?objective=${this.objective}`)
+      const responseJson = await response.json()
+      this.exampleTaskList = JSON.parse(responseJson.content).tasks
+      
+    } catch (err) {
+      console.error(err)
+    }
+    
     const skillDescriptions = this.skillRegistry.getSkillDescriptions();
     this.abortController = new AbortController();
     this.statusCallback({ type: 'creating' });
@@ -58,6 +66,10 @@ export class BabyElfAGI extends AgentExecuter {
       this.messageCallback,
       this.abortController,
       this.language,
+      {
+        objective: this.objective, 
+        tasks: this.exampleTaskList
+      }
     );
     this.taskCallback(this.taskRegistry.tasks)
     this.printer.printTaskList(this.taskRegistry.tasks, 0);
@@ -171,6 +183,21 @@ export class BabyElfAGI extends AgentExecuter {
 
   async finishup() {
     const tasks = this.taskRegistry.getTasks();
+    // const date = new Date().toISOString().replace(/[:.]/g, '-');
+    // fetch('/api/local/write-file', {
+    //   method: 'POST',
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //       body: JSON.stringify(
+    //         {
+    //           filename: `data/example_tasks/example_${date}.json`, 
+    //           content: { 
+    //             objective: this.objective, 
+    //             tasks 
+    //           } 
+    //         })
+    // })
     const lastTask = tasks[tasks.length - 1];
     this.messageCallback({
       type: 'final-result',

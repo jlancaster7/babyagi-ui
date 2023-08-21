@@ -18,7 +18,7 @@ export const largeTextExtract = async (
 
   // for status message
   const total = Math.ceil(largeString.length / (chunkSize - overlap));
-
+  let index = 1;
   for (let i = 0; i < largeString.length; i += chunkSize - overlap) {
     if (!isRunningRef.current) break;
 
@@ -27,15 +27,18 @@ export const largeTextExtract = async (
     const chunk = largeString.slice(i, i + chunkSize);
     // Client side call
     if (getUserApiKey()) {
-      const response = await relevantInfoExtractionAgent(
+      console.log('client side text extract')
+      const response: string = await relevantInfoExtractionAgent(
         objective,
         task.task,
         notes,
         chunk,
       );
-      notes += response;
+      if (response.toLocaleLowerCase() !== 'none') notes += response;
+      index++
     } else {
       // Server side call
+      console.log('server side text extract')
       const response = await axios
         .post(
           '/api/tools/extract',
@@ -57,7 +60,8 @@ export const largeTextExtract = async (
           }
         });
       notes += response?.data?.response;
-    }
+    } 
+    
   }
   return notes;
 };

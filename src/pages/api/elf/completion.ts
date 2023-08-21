@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const {
-      prompt,
+      chatMessages,
       model_name,
       temperature,
       max_tokens,
@@ -23,7 +23,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       verbose: true,
     });
 
-    const response = await llm.call([new HumanChatMessage(prompt)]);
+    const response = await llm.call(JSON.parse(chatMessages));
 
     return res.status(200).json({ response: response.text });
   } catch (error) {

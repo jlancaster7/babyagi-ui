@@ -1,9 +1,9 @@
 {
-  "objective": "Look up AI news from today (May 27, 2023) and write a poem.",
-  "examples": [
+  "objective": "What was Crowdstrike's Net Retention Rate last quarter?",
+  "tasks": [
     {
       "id": 1,
-      "task": "AI news today",
+      "task": "Search for CrowdStrike's net retention rate last quarter.",
       "skill": "web_search",
       "icon": "🔎",
       "dependent_task_ids": [],
@@ -11,7 +11,7 @@
     },
     {
       "id": 2,
-      "task": "Summarize a news article",
+      "task": "Analyze the web search results to find the net retention rate.",
       "skill": "text_completion",
       "icon": "🤖",
       "dependent_task_ids": [1],
@@ -19,18 +19,50 @@
     },
     {
       "id": 3,
-      "task": "Pick up important news",
-      "skill": "text_completion",
-      "icon": "🤖",
-      "dependent_task_ids": [2],
+      "task": "Search for CrowdStrike's net retention rate last quarter.",
+      "skill": "filing_search",
+      "icon": "🗄",
+      "dependentTaskIds": [],
       "status": "incomplete"
     },
     {
       "id": 4,
+      "task": "Analyze the conference call transcripts to find the net retention rate.",
+      "skill": "text_completion",
+      "icon": "🤖",
+      "dependent_task_ids": [3],
+      "status": "incomplete"
+    },
+    {
+      "id": 5,
+      "task": "Search for CrowdStrike's net retention rate last quarter.",
+      "skill": "transcript_search",
+      "icon": "📞",
+      "dependent_task_ids": [],
+      "status": "incomplete"
+    },
+    {
+      "id": 6,
+      "task": "Analyze the conference call transcripts to find the net retention rate.",
+      "skill": "text_completion",
+      "icon": "🤖",
+      "dependent_task_ids": [5],
+      "status": "incomplete"
+    },
+    {
+      "id": 7,
+      "task": "Analyze the results from the web search, filing search and transcript search to see if you are able to find what Crowdstrike's Net Retention Rate was last quarter.",
+      "skill": "text_completion",
+      "icon": "🤖",
+      "dependent_task_ids": [2,4,6],
+      "status": "incomplete"
+    },
+    {
+      "id": 8,
       "task": "Final summary report",
       "skill": "text_completion",
       "icon": "🤖",
-      "dependent_task_ids": [1, 2, 3],
+      "dependent_task_ids": [7],
       "status": "incomplete"
     }
   ]

@@ -1,6 +1,6 @@
 {
   "objective": "what did regions financial say on their recent call about deposit flows?",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Search for commentary about deposits and deposit flows during the current quarter.",

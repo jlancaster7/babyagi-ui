@@ -1,6 +1,6 @@
 {
   "objective": "Create new example objective for researching waterproof kid shoes.",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Read the contents of example1.json in the example_objectives folder using the code_reader skill.",

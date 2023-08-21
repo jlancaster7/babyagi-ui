@@ -12,16 +12,18 @@ export default async function handler(
   }
 
   if (req.method === 'POST') {
-    const filePath = path.join(process.cwd(), req.body.filename);
-    const content = req.body.content;
-
-    console.log(`Writing file: ${filePath}`);
-    console.log(`Content: ${content}`);
 
     try {
-      await fs.writeFile(filePath, content, 'utf8');
+      
+      const filePath = path.join(process.cwd(), req.body.filename);
+      const content = req.body.content;
+
+      console.log(`Writing file: ${filePath}`);
+      console.log(`Content: ${JSON.stringify(content)}`);
+      await fs.writeFile(filePath, JSON.stringify(content));
       res.status(200).json({ message: 'File written successfully' });
     } catch (err) {
+      console.error(err)
       res.status(500).json({ error: 'Failed to write file' });
     }
   } else {

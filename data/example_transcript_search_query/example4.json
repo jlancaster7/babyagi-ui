@@ -1,0 +1,6 @@
+{
+    "task": "Search for forward financial guidance provided in the Q1 2023 earnings call.",
+    "objective": "Did the company provide any financial guidance during the call?",
+    "dependent_task_output": "",
+    "search_query": ["financial forward guidance", "financial outlook", "guidance for next year", "guidance for next quarter"]
+}

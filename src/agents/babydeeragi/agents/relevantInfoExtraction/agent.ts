@@ -3,6 +3,8 @@ import { OpenAIChat } from 'langchain/llms/openai';
 import { relevantInfoExtractionPrompt } from './prompt';
 import { LLMChain } from 'langchain/chains';
 import axios from 'axios';
+import { HumanChatMessage } from 'langchain/schema';
+import { ChatOpenAI } from 'langchain/chat_models/openai';
 
 // TODO: Only client-side requests are allowed.
 // To use the environment variable API key, the request must be implemented from the server side.
@@ -47,26 +49,30 @@ export const relevantInfoExtractionAgent = async (
     return response?.data?.response;
   }
 
-  const prompt = relevantInfoExtractionPrompt();
-  const llm = new OpenAIChat(
+  const prompt = `You are an AI assistant that helps people extract information out of documents.
+  Your current task is ${task}. 
+  Analyze the following text and return information directly related to your current task. 
+  Only return information directly related to your current task.
+  ${notes.length ? `The following is information that we've gathered thus far: ${notes}` : ''}
+  Text to analyze: ${chunk} 
+  New Information:
+  `
+  
+  const llm = new ChatOpenAI(
     {
       openAIApiKey,
       modelName,
-      temperature: 0.2,
+      temperature: 0,
       maxTokens: 800,
       topP: 1,
-      stop: ['###'],
+      maxRetries: 3
     },
     { baseOptions: { signal: signal } },
   );
-  const chain = new LLMChain({ llm: llm, prompt });
+
+  //const chain = new LLMChain({ llm: llm, prompt });
   try {
-    const response = await chain.call({
-      objective,
-      task,
-      notes,
-      chunk,
-    });
+    const response = await llm.call([new HumanChatMessage(prompt)])
     return response.text;
   } catch (error: any) {
     if (error.name === 'AbortError') {

@@ -1,6 +1,6 @@
 {
   "objective": "Create a new skill that writes a poem based on an input.",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Read the code in textCompletion.ts using the code_reader skill to understand its structure and concepts.",

@@ -48,6 +48,8 @@ const getAndFormatFilingTable = async (
     );
     if (!filingTableObject.decomposedNode) return {} as SimilarDoc;
     const filingTableText =
+        filingTableObject.lastHeader +
+        "\n" +
         filingTableObject.precedingText +
         "\n" +
         filingTableObject.decomposedNode.map((a: string[]) => a.join(" ")).join("\n") +

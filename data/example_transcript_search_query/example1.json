@@ -1,0 +1,6 @@
+{
+    "task": "Search for commentary related to key revenue segments.",
+    "objective": "What did management say about their main revenue segments during their latest call?",
+    "dependent_task_output": "",
+    "search_query": ["commentary on revenue segments", "key products", "key services", "main drivers of revenue"]
+}

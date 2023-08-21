@@ -1,6 +1,6 @@
 {
   "objective": "Based on skillSaver.ts, write a new skill called objectiveSaver.ts which saves a new example_objective.",
-  "examples": [
+  "tasks": [
     {
       "id": 1,
       "task": "Look up the code in skillSaver.ts using the code_reader skill to understand its structure and concepts.",
